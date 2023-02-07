@@ -38,20 +38,24 @@ function block_until_press_on_target {
     TARGET_X_MAX=37000
     TARGET_Y_MAX=42000
 
-    TOUCHSCREEN_ID=$(xinput --list 2>/dev/null | grep -i -m 1 'touch' | grep -o 'id=[0-9]\+' | grep -o '[0-9]\+')
+    TOUCHSCREEN_ID=$(xinput --list 2>/dev/null | grep -i -m 1 'xwayland-pointer' | grep -o 'id=[0-9]\+' | grep -o '[0-9]\+')
     touch_x=0
     touch_y=0
     while (( $touch_x < $TARGET_X_MIN )) || (( $touch_x > $TARGET_X_MAX )) || (( $touch_y < $TARGET_Y_MIN )) || (( $touch_y > $TARGET_Y_MAX )); do
         _show_run_prompt
         block_until_mouse_click
         touch_state=$(xinput --query-state $TOUCHSCREEN_ID 2>/dev/null)
+        echo $touch_state
         if [[ $touch_state =~ valuator\[0]=([0-9]*) ]]; then
             touch_x=${BASH_REMATCH[1]}
         fi
         if [[ $touch_state =~ valuator\[1]=([0-9]*) ]]; then
             touch_y=${BASH_REMATCH[1]}
         fi
+        echo $touch_x $touch_y
     done
+
+    quit_prompt
 }
 
 function block_until_mouse_click {
@@ -76,12 +80,12 @@ function set_brightness_to_minimum {
     echo 0 >$brightness_file
 
     # Prevent Steam from changing brightness (make read-only)
-    chmod 444 $brightness_file
+    sudo chmod 444 $brightness_file
 }
 
 function restore_brightness {
     # Allow Steam to change brightness again (make read-write)
-    chmod 666 $brightness_file
+    sudo chmod 666 $brightness_file
 
     # Restore original brightness
     cat ./brightness_bak >$brightness_file
@@ -89,27 +93,7 @@ function restore_brightness {
 }
 
 function start_virtualhere {
-    virtualhere/vhusbdx86_64 >/dev/null 2>&1 &
-    echo $! >./virtualhere_pid
-}
-
-function stop_virtualhere {
-    kill -s SIGINT $(cat ./virtualhere_pid)
-    wait $(cat ./virtualhere_pid)
-    rm ./virtualhere_pid
-}
-
-function start_prompt {
-    # Deprecated
-    prepare_fullscreen
-    show_prompt "Starting in . . . 3"
-    sleep 1
-    prepare_fullscreen
-    show_prompt "Starting in . . . 2"
-    sleep 1
-    prepare_fullscreen
-    show_prompt "Starting in . . . 1"
-    sleep 1
+    sudo virtualhere/vhusbdx86_64 >/dev/null 2>&1 &
 }
 
 function quit_prompt {
@@ -122,16 +106,13 @@ function quit_prompt {
     sleep $sleep_time
     prepare_fullscreen
     show_prompt "Quitting . ."
-    sleep $sleep_time
-    prepare_fullscreen
-    show_prompt "Quitting . . ."
 }
 
 function _show_run_prompt {
     battery=$(cat /sys/class/power_supply/BAT1/capacity)
 
     prepare_fullscreen
-    show_prompt "Press to Quit"
+    show_prompt "Press to Quit $(xinput --list 2>/dev/null | grep -i -m 1 'touch' | grep -o 'id=[0-9]\+' | grep -o '[0-9]\+')"
     show_prompt "-> O <-"
     show_prompt "$battery %"
 }

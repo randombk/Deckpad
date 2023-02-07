@@ -1,4 +1,14 @@
-# Deckpad
+# Deckpad - RandomBK Version
+
+## Changes from Upstream:
+
+1. Migrate away from asking for sudo password and use sudoers config instead
+1. Simplify codebase to improve reliability (at the cost of some luxuries)
+1. Fix issue where touch command doesn't work by migrating to cursor position instead
+
+## ORIGINAL README AS FOLLOWS (Not adapted for changes in fork)
+
+* 
 
 > ⚠️ **WARNING:** This is a mostly stable prototype, but it is very much alpha!
 
@@ -14,6 +24,7 @@
 >   sudo chmod 666 /sys/class/backlight/amdgpu_bl0/brightness
 >   sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target >/dev/null 2>&1
 >   ```
+
 
 ## What is Deckpad?
 

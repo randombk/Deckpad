@@ -1,0 +1,11 @@
+# Allow deckpad to enable & disable sleep without root
+%wheel ALL=NOPASSWD: /usr/bin/systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
+%wheel ALL=NOPASSWD: /usr/bin/systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+
+# Allow access to server
+%wheel ALL=NOPASSWD: /home/deck/Deckpad/virtualhere/vhusbdx86_64
+
+# Allow deckpad to change permissions on brightness settings
+%wheel ALL=NOPASSWD: /usr/bin/chmod 666 /sys/class/backlight/amdgpu_bl0/brightness
+%wheel ALL=NOPASSWD: /usr/bin/chmod 444 /sys/class/backlight/amdgpu_bl0/brightness
+
