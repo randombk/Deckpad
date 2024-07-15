@@ -18,18 +18,10 @@ function show_prompt {
     else
         style=$2
     fi
-    if command -v figlet &>/dev/null; then
-        figlet -c -w 180 -f $style -k -- "$prompt"
-        echo ""
-        echo ""
-        echo ""
-    else
-        echo "-----------------------------------"
-        echo ""
-        echo "         $prompt"
-        echo ""
-        echo "-----------------------------------"
-    fi
+    figlet -c -w 180 -f $style -k -- "$prompt"
+    echo ""
+    echo ""
+    echo ""
 }
 
 function block_until_press_on_target {
@@ -38,24 +30,20 @@ function block_until_press_on_target {
     TARGET_X_MAX=37000
     TARGET_Y_MAX=42000
 
-    TOUCHSCREEN_ID=$(xinput --list 2>/dev/null | grep -i -m 1 'xwayland-pointer' | grep -o 'id=[0-9]\+' | grep -o '[0-9]\+')
+    TOUCHSCREEN_ID=$(xinput --list 2>/dev/null | grep -i -m 1 'touch' | grep -o 'id=[0-9]\+' | grep -o '[0-9]\+')
     touch_x=0
     touch_y=0
     while (( $touch_x < $TARGET_X_MIN )) || (( $touch_x > $TARGET_X_MAX )) || (( $touch_y < $TARGET_Y_MIN )) || (( $touch_y > $TARGET_Y_MAX )); do
         _show_run_prompt
         block_until_mouse_click
         touch_state=$(xinput --query-state $TOUCHSCREEN_ID 2>/dev/null)
-        echo $touch_state
         if [[ $touch_state =~ valuator\[0]=([0-9]*) ]]; then
             touch_x=${BASH_REMATCH[1]}
         fi
         if [[ $touch_state =~ valuator\[1]=([0-9]*) ]]; then
             touch_y=${BASH_REMATCH[1]}
         fi
-        echo $touch_x $touch_y
     done
-
-    quit_prompt
 }
 
 function block_until_mouse_click {
@@ -94,6 +82,13 @@ function restore_brightness {
 
 function start_virtualhere {
     sudo virtualhere/vhusbdx86_64 >/dev/null 2>&1 &
+    echo $! >./virtualhere_pid
+}
+
+function stop_virtualhere {
+    sudo killall -s SIGINT vhusbdx86_64
+    wait $(cat ./virtualhere_pid)
+    rm ./virtualhere_pid
 }
 
 function quit_prompt {

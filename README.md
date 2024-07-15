@@ -3,19 +3,17 @@
 ## Changes from Upstream:
 
 1. Migrate away from asking for sudo password and use sudoers config instead
-1. Simplify codebase to improve reliability (at the cost of some luxuries)
-1. Fix issue where touch command doesn't work by migrating to cursor position instead
 
 ## ORIGINAL README AS FOLLOWS (Not adapted for changes in fork)
 
-* 
+# Deckpad
 
 > ⚠️ **WARNING:** This is a mostly stable prototype, but it is very much alpha!
 
-> ⚠️ After updating to Steam OS 3.4 you need to update the `Launch Options`   
-> You need to add `--fullscreen`
-> - Old: `-u LD_PRELOAD konsole --fullscreen -e ./deckpad.sh`
-> - New: `-u LD_PRELOAD konsole -e ./deckpad.sh`
+> ⚠️ After every Steam OS update, make sure to run
+> ```
+> ~/Deckpad/install_pacman_packages.sh
+> ```
 
 > ⚠️ **WARNING:** If you quit Deckpad without pressing on the screen (or if it doesn't work on your device), it won't clean up and will prevent sleep and brightness changes!
 > - The easiest way way to fix it is to run Deckpad again, and quit it by clicking on the target in the middle of the screen  
@@ -24,7 +22,6 @@
 >   sudo chmod 666 /sys/class/backlight/amdgpu_bl0/brightness
 >   sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target >/dev/null 2>&1
 >   ```
-
 
 ## What is Deckpad?
 
@@ -41,7 +38,7 @@ Once setup, all you have to do is to launch **Deckpad**, enter your password, an
 
 Welcome Screen              |  Running Screen
 :-------------------------:|:-------------------------:
-![](https://github.com/FlorianKempenich/Deckpad/raw/main/doc/welcome_screen.jpg)  |  ![](https://github.com/FlorianKempenich/Deckpad/raw/main/doc/running_screen.jpg)
+![](https://github.com/HelloThisIsFlo/Deckpad/raw/main/doc/welcome_screen.jpg)  |  ![](https://github.com/HelloThisIsFlo/Deckpad/raw/main/doc/running_screen.jpg)
 
 
 ## Setup Instructions
@@ -51,39 +48,57 @@ Welcome Screen              |  Running Screen
 > ```
 ### On Steam Deck
 
-1. Set a `sudo` password: [SteamDeckTips Tutorial](https://steamdecktips.com/blog/how-to-set-a-password-for-your-steam-deck-user-in-desktop-mode)
-2. Clone repo
-    
-    ```bash
-    cd ~ && git clone https://github.com/FlorianKempenich/Deckpad.git
-    ```
-    
-3. Run `./initialize_after_os_update.sh`
-    
-    This will:
-    
-    - Disable `readonly` mode on SteamOS
-    - Initialize `pacman`
-    - Install `xorg-xinput` and `figlet`
-4. Download: [VirtualHere USB Server for Linux (x86_64)](https://www.virtualhere.com/sites/default/files/usbserver/vhusbdx86_64)      
-5. Put in `~/Deckpad/virtualhere/`
-6. Make executable: `chmod +x vhusbdx86_64`
-7. Add a “fake” game to the steam library *(shortcut will be updated, so the app doesn’t matter, pick whichever)*
-8. Select “fake” game and click `Properties`
-9. Replace with these values
-    
-    
-    | Title | Deckpad |
-    | --- | --- |
-    | Target | `env` |
-    | Start | `"/home/deck/Deckpad"` (don’t remove " symbols) |
-    | Launch Opts | `-u LD_PRELOAD konsole --fullscreen -e ./deckpad.sh` |
-    - and this icon
+1. Initialize Everything
+
+    1. Set a `sudo` password: [SteamDeckTips Tutorial](https://steamdecktips.com/blog/how-to-set-a-password-for-your-steam-deck-user-in-desktop-mode)
+    2. Clone repo
         
-        ![controller_wireless_icon.png](https://github.com/FlorianKempenich/Deckpad/blob/main/icon.png)
+        ```bash
+        cd ~ && git clone https://github.com/HelloThisIsFlo/Deckpad.git
+        ```
         
-    
-10. Launch it once
+    3. Run `./initialize_after_os_update.sh`
+        
+        This will:
+        
+        - Disable `readonly` mode on SteamOS
+        - Initialize `pacman`
+        - Install `xorg-xinput` and `figlet`
+    4. Download: [VirtualHere USB Server for Linux (x86_64)](https://www.virtualhere.com/sites/default/files/usbserver/vhusbdx86_64)      
+    5. Put in `~/Deckpad/virtualhere/`
+    6. Make executable: `chmod +x vhusbdx86_64`
+
+2. Create the launcher for Deckpad
+
+    1. Add a “fake” game to the steam library *(shortcut will be updated, so the app doesn’t matter, pick whichever)*
+    2. Select “fake” game and click `Properties`
+    3. Replace with these values
+        
+        
+        | Title | Deckpad |
+        | --- | --- |
+        | Target | `env` |
+        | Start | `"/home/deck/Deckpad"` (don’t remove " symbols) |
+        | Launch Opts | `-u LD_PRELOAD konsole --fullscreen -e ./deckpad.sh` |
+        - and this icon
+            
+            ![controller_wireless_icon.png](https://github.com/HelloThisIsFlo/Deckpad/blob/main/icon.png)
+            
+        
+3. Enable touchscreen <- **Do this in Game Mode**  
+  _Thank you [Jeoshua](https://github.com/Jeoshua) for figuring this one out!_
+    1. Open the Deckpad launcher page
+    2. Tap on the controler icon
+    3. Click: `Edit Layout`
+    4. Click: `Action Sets`
+    5. Click the Gear icon next to `Default`
+    6. Click: `Add Always-On command`
+    7. Click: `Add command` (on the newly added 'Always On Command')
+    8. Click: `System` (tab, at the top)
+    9. Click: `Touchscreen Native Support`
+    10. Back out until you're back on the Deckpad launcher page
+
+4. Launch Deckpad once, and you're all done for the SteamDeck side of things 🎉
 
 
 ### On Windows Gaming PC
